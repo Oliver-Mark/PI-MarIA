@@ -28,7 +28,7 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
       <img 
         src={logoMaria} 
         alt="Logo MarIA" 
-        className="w-48 h-auto mb-8 animate-fade-in"
+        className="w-72 h-auto mb-8 animate-fade-in rounded-3xl"
       />
       <div className="flex flex-col items-center gap-4">
         <p className="text-white text-2xl font-semibold animate-fade-in">
