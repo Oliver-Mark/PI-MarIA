@@ -55,7 +55,7 @@ const Dashboard = () => {
             {/* Coluna Esquerda - Avisos e Notificações */}
             <div className="space-y-6">
               {/* Carrossel de Avisos */}
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden bg-muted/30">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Bell className="w-5 h-5 text-primary" />
@@ -100,7 +100,7 @@ const Dashboard = () => {
               </Card>
 
               {/* Notificações */}
-              <Card>
+              <Card className="bg-muted/30">
                 <CardHeader>
                   <CardTitle className="text-lg">Notificações</CardTitle>
                 </CardHeader>
@@ -121,7 +121,7 @@ const Dashboard = () => {
             </div>
 
             {/* Coluna Direita - Agenda do Dia */}
-            <Card className="lg:col-span-2">
+            <Card className="lg:col-span-2 bg-muted/30">
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Calendar className="w-6 h-6 text-primary" />
