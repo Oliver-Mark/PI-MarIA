@@ -1,53 +1,45 @@
 import { useEffect, useState } from "react";
+import logoMaria from "@/assets/logo-maria.png";
 
 interface LoadingScreenProps {
   onComplete: () => void;
 }
 
 const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
-  const [isVideoEnded, setIsVideoEnded] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    const video = document.getElementById("loading-video") as HTMLVideoElement;
-    
-    if (video) {
-      video.play().catch(error => {
-        console.error("Erro ao reproduzir vídeo:", error);
-        // Se o vídeo falhar, pula após 3 segundos
-        setTimeout(() => {
-          onComplete();
-        }, 3000);
-      });
+    const timer = setTimeout(() => {
+      setIsComplete(true);
+      setTimeout(() => {
+        onComplete();
+      }, 500);
+    }, 3000);
 
-      const handleVideoEnd = () => {
-        setIsVideoEnded(true);
-        setTimeout(() => {
-          onComplete();
-        }, 500);
-      };
-
-      video.addEventListener("ended", handleVideoEnd);
-
-      return () => {
-        video.removeEventListener("ended", handleVideoEnd);
-      };
-    }
+    return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-500 ${
-        isVideoEnded ? "opacity-0" : "opacity-100"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#40b5ad] transition-opacity duration-500 ${
+        isComplete ? "opacity-0" : "opacity-100"
       }`}
     >
-      <video
-        id="loading-video"
-        className="w-full h-full object-contain"
-        muted
-        playsInline
-      >
-        <source src="/loading.mp4" type="video/mp4" />
-      </video>
+      <img 
+        src={logoMaria} 
+        alt="Logo MarIA" 
+        className="w-48 h-auto mb-8 animate-fade-in"
+      />
+      <div className="flex flex-col items-center gap-4">
+        <p className="text-white text-2xl font-semibold animate-fade-in">
+          Bem-Vindo
+        </p>
+        <div className="flex gap-2">
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+        </div>
+      </div>
     </div>
   );
 };
