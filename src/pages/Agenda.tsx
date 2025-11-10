@@ -28,10 +28,20 @@ const appointments = [
 
 const Agenda = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  const totalAppointments = appointments.length;
-  const confirmedAppointments = appointments.filter(a => a.status === "confirmed").length;
-  const scheduledAppointments = appointments.filter(a => a.status === "scheduled").length;
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setIsCalendarOpen(false);
+  };
+
+  // Filtrar appointments pela data selecionada (por enquanto mostra todos, você pode adicionar lógica de filtro real)
+  const filteredAppointments = appointments;
+  const hasAppointments = filteredAppointments.length > 0;
+
+  const totalAppointments = filteredAppointments.length;
+  const confirmedAppointments = filteredAppointments.filter(a => a.status === "confirmed").length;
+  const scheduledAppointments = filteredAppointments.filter(a => a.status === "scheduled").length;
   const totalSlots = 16; // Total de vagas disponíveis no dia
   const availableSlots = totalSlots - totalAppointments;
 
@@ -55,7 +65,7 @@ const Agenda = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Popover>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -72,7 +82,7 @@ const Agenda = () => {
                     <Calendar
                       mode="single"
                       selected={selectedDate}
-                      onSelect={setSelectedDate}
+                      onSelect={handleDateSelect}
                       initialFocus
                       className="pointer-events-auto"
                     />
@@ -127,36 +137,48 @@ const Agenda = () => {
               <CardTitle className="text-xl">Pacientes do Dia</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {appointments.map((appointment) => (
-                  <div
-                    key={appointment.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:border-primary/50 transition-colors"
-                  >
-                    <div className="flex-shrink-0 w-16">
-                      <div className="text-lg font-bold text-primary">{appointment.time}</div>
+              {hasAppointments ? (
+                <div className="space-y-3">
+                  {filteredAppointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:border-primary/50 transition-colors"
+                    >
+                      <div className="flex-shrink-0 w-16">
+                        <div className="text-lg font-bold text-primary">{appointment.time}</div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground">{appointment.patient}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Motivo: {appointment.reason}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <Badge
+                          variant={appointment.status === "confirmed" ? "default" : "secondary"}
+                          className={
+                            appointment.status === "confirmed"
+                              ? "bg-primary/10 text-primary hover:bg-primary/20"
+                              : "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20"
+                          }
+                        >
+                          {appointment.status === "confirmed" ? "Confirmado" : "Agendado"}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-foreground">{appointment.patient}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Motivo: {appointment.reason}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <Badge
-                        variant={appointment.status === "confirmed" ? "default" : "secondary"}
-                        className={
-                          appointment.status === "confirmed"
-                            ? "bg-primary/10 text-primary hover:bg-primary/20"
-                            : "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20"
-                        }
-                      >
-                        {appointment.status === "confirmed" ? "Confirmado" : "Agendado"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <CalendarIcon className="w-16 h-16 text-muted-foreground/40 mb-4" />
+                  <p className="text-lg font-medium text-foreground mb-2">
+                    Nenhuma agenda programada
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Não há pacientes agendados para esta data.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
