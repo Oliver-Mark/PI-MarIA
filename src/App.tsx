@@ -8,6 +8,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import Login from "./pages/Login";
 import SelectUnit from "./pages/SelectUnit";
 import Dashboard from "./pages/Dashboard";
+import Agenda from "./pages/Agenda";
 import WaitingRoom from "./pages/WaitingRoom";
 import Patients from "./pages/Patients";
 import Signature from "./pages/Signature";
@@ -42,6 +43,7 @@ const App = () => {
             <Route path="/" element={<Login />} />
             <Route path="/select-unit" element={<SelectUnit />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/agenda" element={<Agenda />} />
             <Route path="/waiting-room" element={<WaitingRoom />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/signature" element={<Signature />} />

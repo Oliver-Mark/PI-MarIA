@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Calendar, Users, FileSignature, BarChart3, Clock } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, FileSignature, BarChart3, Clock } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 const menuItems = [
-  { icon: Calendar, label: "Agenda", path: "/dashboard" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: Calendar, label: "Agenda", path: "/agenda" },
   { icon: Clock, label: "Sala de Espera", path: "/waiting-room" },
   { icon: Users, label: "Pacientes", path: "/patients" },
   { icon: FileSignature, label: "Assinatura Eletrônica", path: "/signature" },
