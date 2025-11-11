@@ -18,7 +18,7 @@ const DashboardSidebar = () => {
     <aside
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
-      className={`fixed left-0 top-16 bottom-0 bg-card border-r transition-all duration-300 ease-in-out z-30 ${
+      className={`fixed left-0 top-16 bottom-0 bg-sidebar border-r border-sidebar/20 transition-all duration-300 ease-in-out z-30 ${
         isExpanded ? "w-64" : "w-20"
       }`}
     >
@@ -28,8 +28,8 @@ const DashboardSidebar = () => {
             <NavLink
               key={item.path}
               to={item.path}
-              className="flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-muted/50 group"
-              activeClassName="bg-primary/10 text-primary"
+              className="flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white/10 group text-sidebar-foreground"
+              activeClassName="bg-white/20 text-white font-semibold"
             >
               <item.icon className="w-6 h-6 flex-shrink-0 group-hover:scale-110 transition-transform" />
               <span

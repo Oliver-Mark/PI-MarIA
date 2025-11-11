@@ -19,7 +19,7 @@ const DashboardHeader = () => {
   };
 
   return (
-    <header className="h-16 border-b bg-card flex items-center justify-between px-6 sticky top-0 z-40">
+    <header className="h-16 border-b bg-header flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
       <div className="flex items-center">
         <img 
           src={logoMaria} 
@@ -29,14 +29,14 @@ const DashboardHeader = () => {
       </div>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-muted/50 rounded-lg px-3 py-2 transition-colors">
+        <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-white/10 rounded-lg px-3 py-2 transition-colors">
           <img 
             src={defaultAvatar} 
             alt={userName} 
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover border-2 border-white/20"
           />
-          <span className="font-medium hidden sm:block">{userName}</span>
-          <ChevronDown className="w-4 h-4" />
+          <span className="font-medium hidden sm:block text-header-foreground">{userName}</span>
+          <ChevronDown className="w-4 h-4 text-header-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem className="cursor-pointer">
