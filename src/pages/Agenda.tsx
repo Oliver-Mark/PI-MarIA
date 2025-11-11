@@ -13,17 +13,17 @@ import { Badge } from "@/components/ui/badge";
 
 const appointments = [
   { id: 1, time: "08:00", patient: "Maria Silva Santos", reason: "Consulta", status: "confirmed" },
-  { id: 2, time: "08:30", patient: "João Pedro Oliveira", reason: "Retorno", status: "confirmed" },
-  { id: 3, time: "09:00", patient: "Ana Carolina Souza", reason: "Exame", status: "scheduled" },
-  { id: 4, time: "09:30", patient: "Carlos Eduardo Lima", reason: "Consulta", status: "confirmed" },
-  { id: 5, time: "10:00", patient: "Fernanda Martins Costa", reason: "Consulta", status: "confirmed" },
-  { id: 6, time: "10:30", patient: "Ricardo Alves Pereira", reason: "Retorno", status: "confirmed" },
-  { id: 7, time: "11:00", patient: "Juliana Ferreira Santos", reason: "Exame", status: "scheduled" },
-  { id: 8, time: "11:30", patient: "Paulo Roberto Silva", reason: "Consulta", status: "confirmed" },
-  { id: 9, time: "14:00", patient: "Mariana Costa Lima", reason: "Retorno", status: "confirmed" },
-  { id: 10, time: "14:30", patient: "Gabriel Santos Oliveira", reason: "Consulta", status: "confirmed" },
-  { id: 11, time: "15:00", patient: "Beatriz Almeida Rocha", reason: "Exame", status: "scheduled" },
-  { id: 12, time: "15:30", patient: "Lucas Mendes Barbosa", reason: "Consulta", status: "confirmed" },
+  { id: 2, time: "08:10", patient: "João Pedro Oliveira", reason: "Retorno", status: "confirmed" },
+  { id: 3, time: "08:20", patient: "Ana Carolina Souza", reason: "Exame", status: "scheduled" },
+  { id: 4, time: "08:30", patient: "Carlos Eduardo Lima", reason: "Consulta", status: "confirmed" },
+  { id: 5, time: "08:40", patient: "Fernanda Martins Costa", reason: "Consulta", status: "confirmed" },
+  { id: 6, time: "08:50", patient: "Ricardo Alves Pereira", reason: "Retorno", status: "confirmed" },
+  { id: 7, time: "09:00", patient: "Juliana Ferreira Santos", reason: "Exame", status: "scheduled" },
+  { id: 8, time: "09:10", patient: "Paulo Roberto Silva", reason: "Consulta", status: "confirmed" },
+  { id: 9, time: "09:20", patient: "Mariana Costa Lima", reason: "Retorno", status: "confirmed" },
+  { id: 10, time: "09:30", patient: "Gabriel Santos Oliveira", reason: "Consulta", status: "confirmed" },
+  { id: 11, time: "09:40", patient: "Beatriz Almeida Rocha", reason: "Exame", status: "scheduled" },
+  { id: 12, time: "09:50", patient: "Lucas Mendes Barbosa", reason: "Consulta", status: "confirmed" },
 ];
 
 const Agenda = () => {
@@ -39,10 +39,24 @@ const Agenda = () => {
   const filteredAppointments = appointments;
   const hasAppointments = filteredAppointments.length > 0;
 
+  // Generate time slots from 7:00 to 18:00 with 10-minute intervals
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 7; hour <= 18; hour++) {
+      for (let minute = 0; minute < 60; minute += 10) {
+        if (hour === 18 && minute > 0) break; // Stop at 18:00
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        slots.push(time);
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+  const totalSlots = timeSlots.length;
   const totalAppointments = filteredAppointments.length;
   const confirmedAppointments = filteredAppointments.filter(a => a.status === "confirmed").length;
   const scheduledAppointments = filteredAppointments.filter(a => a.status === "scheduled").length;
-  const totalSlots = 16; // Total de vagas disponíveis no dia
   const availableSlots = totalSlots - totalAppointments;
 
   return (
@@ -188,13 +202,13 @@ const Agenda = () => {
               <CardTitle className="text-xl">Horários Disponíveis</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-                {["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"].map((time) => {
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                {timeSlots.map((time) => {
                   const isBooked = filteredAppointments.some(apt => apt.time === time);
                   return (
                     <div
                       key={time}
-                      className={`p-3 rounded-lg border text-center font-medium ${
+                      className={`p-3 rounded-lg border text-center font-medium text-sm ${
                         isBooked 
                           ? "bg-muted border-border text-muted-foreground" 
                           : "bg-green-500/10 border-green-500/20 text-green-600"

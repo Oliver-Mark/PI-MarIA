@@ -2,21 +2,21 @@ import { useState } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, UserCheck, Phone, CheckCircle2 } from "lucide-react";
+import { Clock, UserCheck, Bell, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const waitingPatients = [
-  { id: 1, scheduledTime: "08:00", arrivalTime: "07:55", patient: "Maria Silva Santos", reason: "Consulta", doctor: "Dr. João Mendes" },
-  { id: 2, scheduledTime: "08:30", arrivalTime: "08:25", patient: "João Pedro Oliveira", reason: "Retorno", doctor: "Dr. João Mendes" },
-  { id: 3, scheduledTime: "09:00", arrivalTime: "08:50", patient: "Ana Carolina Souza", reason: "Exame", doctor: "Dra. Maria Costa" },
-  { id: 4, scheduledTime: "09:30", arrivalTime: "09:20", patient: "Carlos Eduardo Lima", reason: "Consulta", doctor: "Dr. João Mendes" },
+  { id: 1, scheduledTime: "08:00", arrivalTime: "07:55", patient: "Maria Silva Santos", reason: "Consulta", doctor: "Dr. João Silva" },
+  { id: 2, scheduledTime: "08:30", arrivalTime: "08:25", patient: "João Pedro Oliveira", reason: "Retorno", doctor: "Dr. João Silva" },
+  { id: 3, scheduledTime: "09:00", arrivalTime: "08:50", patient: "Ana Carolina Souza", reason: "Exame", doctor: "Dr. João Silva" },
+  { id: 4, scheduledTime: "09:30", arrivalTime: "09:20", patient: "Carlos Eduardo Lima", reason: "Consulta", doctor: "Dr. João Silva" },
 ];
 
 const attendedPatients = [
-  { id: 5, scheduledTime: "07:30", arrivalTime: "07:25", patient: "Fernanda Martins Costa", reason: "Consulta", doctor: "Dr. João Mendes" },
-  { id: 6, scheduledTime: "07:00", arrivalTime: "06:55", patient: "Ricardo Alves Pereira", reason: "Retorno", doctor: "Dra. Maria Costa" },
+  { id: 5, scheduledTime: "07:30", arrivalTime: "07:25", patient: "Fernanda Martins Costa", reason: "Consulta", doctor: "Dr. João Silva" },
+  { id: 6, scheduledTime: "07:00", arrivalTime: "06:55", patient: "Ricardo Alves Pereira", reason: "Retorno", doctor: "Dr. João Silva" },
 ];
 
 const WaitingRoom = () => {
@@ -90,7 +90,7 @@ const WaitingRoom = () => {
                             onClick={() => handleCall(patient.id)}
                             className="gap-2"
                           >
-                            <Phone className="w-4 h-4" />
+                            <Bell className="w-4 h-4" />
                             Chamar
                           </Button>
                           <Button
