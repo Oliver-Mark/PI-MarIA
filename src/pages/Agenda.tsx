@@ -181,6 +181,32 @@ const Agenda = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Horários Disponíveis */}
+          <Card className="bg-muted/30 mt-6">
+            <CardHeader>
+              <CardTitle className="text-xl">Horários Disponíveis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                {["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"].map((time) => {
+                  const isBooked = filteredAppointments.some(apt => apt.time === time);
+                  return (
+                    <div
+                      key={time}
+                      className={`p-3 rounded-lg border text-center font-medium ${
+                        isBooked 
+                          ? "bg-muted border-border text-muted-foreground" 
+                          : "bg-green-500/10 border-green-500/20 text-green-600"
+                      }`}
+                    >
+                      {time}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
