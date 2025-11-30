@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, LogOut, ChevronDown } from "lucide-react";
-import logoMaria from "@/assets/logo-maria.png";
+import { Settings, LogOut, ChevronDown, Menu } from "lucide-react";
 import defaultAvatar from "@/assets/default-avatar.jpg";
 import {
   DropdownMenu,
@@ -9,41 +7,53 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
-const DashboardHeader = () => {
+interface DashboardHeaderProps {
+  onMenuClick: () => void;
+  userName?: string;
+}
+
+const DashboardHeader = ({ onMenuClick, userName = "Dr. João Silva" }: DashboardHeaderProps) => {
   const navigate = useNavigate();
-  const [userName] = useState("Dr. João Silva");
 
   const handleLogout = () => {
     navigate("/");
   };
 
   return (
-    <header className="h-16 border-b bg-header flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
-      <div className="flex items-center">
-        <img 
-          src={logoMaria} 
-          alt="MarIA" 
-          className="h-10 w-auto rounded-lg"
-        />
+    <header className="fixed top-4 right-4 left-4 md:left-28 h-16 bg-white/60 backdrop-blur-xl border border-black/5 shadow-lg rounded-2xl z-40 flex items-center justify-between px-4">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden text-slate-800 hover:bg-black/5 hover:text-slate-900"
+          onClick={onMenuClick}
+        >
+          <Menu className="w-6 h-6" />
+          <span className="sr-only">Abrir menu</span>
+        </Button>
       </div>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-white/10 rounded-lg px-3 py-2 transition-colors">
+        <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-black/5 rounded-full px-2 py-1.5 transition-colors">
           <img 
             src={defaultAvatar} 
             alt={userName} 
-            className="w-10 h-10 rounded-full object-cover border-2 border-white/20"
+            className="w-9 h-9 rounded-full object-cover border-2 border-teal-500/50"
           />
-          <span className="font-medium hidden sm:block text-header-foreground">{userName}</span>
-          <ChevronDown className="w-4 h-4 text-header-foreground" />
+          <div className="hidden sm:flex flex-col items-start">
+            <span className="font-medium text-sm text-slate-800">{userName}</span>
+            <span className="text-xs text-slate-500">Médico</span>
+          </div>
+          <ChevronDown className="w-4 h-4 text-slate-500 hidden sm:block" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuContent align="end" className="w-56 mt-2 bg-white/80 backdrop-blur-xl border-black/10 shadow-2xl rounded-lg">
+          <DropdownMenuItem className="cursor-pointer text-slate-700 focus:bg-black/10 focus:text-slate-900">
             <Settings className="w-4 h-4 mr-2" />
-            Configurações
+            Configurações da Conta
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500 focus:text-red-700 focus:bg-red-500/10">
             <LogOut className="w-4 h-4 mr-2" />
             Sair
           </DropdownMenuItem>
