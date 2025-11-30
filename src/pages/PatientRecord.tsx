@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit } from "lucide-react";
+import { Eye, Edit, ArrowLeft } from "lucide-react";
 
 // Mock patient data
 const mockPatient = {
@@ -79,7 +79,17 @@ const PatientRecord = () => {
       
       <main className="ml-20 pt-6 px-6 pb-6">
         <div className="max-w-7xl mx-auto space-y-6">
-          <h1 className="text-3xl font-bold text-foreground">Ficha do Paciente</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate('/waiting-room')}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <h1 className="text-3xl font-bold text-foreground">Ficha do Paciente</h1>
+          </div>
 
           {/* Container 1: Dados do Paciente */}
           <Card className="bg-card animate-fade-in">
