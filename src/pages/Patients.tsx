@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { db } from "@/firebase-config";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Input } from "@/components/ui/input";
@@ -17,12 +17,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-
-// Dados estáticos para o seed inicial
-const staticPatientsData = [
-  { name: "Maria Silva Santos", birthDate: "15/03/1985", cpf: "123.456.789-00", phone: "(11) 98765-4321", lastVisit: "12/10/2025" },
-  { name: "João Pedro Oliveira", birthDate: "22/07/1990", cpf: "234.567.890-11", phone: "(11) 97654-3210", lastVisit: "10/10/2025" },
-];
 
 const GlassCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
   <div className={`bg-white/70 backdrop-blur-xl border border-black/5 shadow-lg rounded-3xl ${className}`}>
@@ -43,7 +37,6 @@ const Patients = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [patients, setPatients] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newPatient, setNewPatient] = useState(InitialPatientState);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,8 +45,16 @@ const Patients = () => {
 
   const fetchPatients = async () => {
     setIsLoading(true);
+    const officeId = localStorage.getItem("officeId");
+    if (!officeId) {
+      console.error("No officeId found in localStorage.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const data = await getDocs(patientsCollectionRef);
+      const q = query(patientsCollectionRef, where("officeIds", "array-contains", officeId));
+      const data = await getDocs(q);
       setPatients(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     } catch (error) {
       console.error("Erro ao buscar pacientes: ", error);
@@ -66,22 +67,6 @@ const Patients = () => {
     fetchPatients();
   }, []);
 
-  const uploadStaticData = async () => {
-    setIsSeeding(true);
-    try {
-      for (const patient of staticPatientsData) {
-        await addDoc(patientsCollectionRef, patient);
-      }
-      alert("Dados iniciais carregados com sucesso!");
-      fetchPatients();
-    } catch (error) {
-      console.error("Erro ao carregar dados iniciais: ", error);
-      alert("Erro ao carregar dados iniciais.");
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setNewPatient((prev) => ({ ...prev, [id]: value }));
@@ -89,16 +74,27 @@ const Patients = () => {
 
   const handleAddPatient = async (e: React.FormEvent) => {
     e.preventDefault();
+    const officeId = localStorage.getItem("officeId");
+
     if (!newPatient.name || !newPatient.cpf) {
       alert("Nome e CPF são obrigatórios.");
       return;
     }
+    if (!officeId) {
+      alert("Erro: Consultório não selecionado. Faça o login novamente.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await addDoc(patientsCollectionRef, newPatient);
+      const patientData = {
+        ...newPatient,
+        officeIds: [officeId], // Save it as an array
+      };
+      await addDoc(patientsCollectionRef, patientData);
       setIsAddDialogOpen(false);
       setNewPatient(InitialPatientState);
-      fetchPatients();
+      fetchPatients(); // Refresh the list
     } catch (error) {
       console.error("Erro ao adicionar paciente: ", error);
       alert("Erro ao adicionar novo paciente.");
@@ -124,7 +120,6 @@ const Patients = () => {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold text-slate-900">Pacientes</h1>
           <div className="flex gap-2">
-            <Button onClick={uploadStaticData} variant="outline" disabled={isSeeding} className="gap-2"><Upload className={`w-4 h-4 ${isSeeding ? 'animate-spin' : ''}`} /> <span className="hidden sm:inline">Carregar Dados</span></Button>
             <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg"><UserPlus className="w-4 h-4" /> <span className="hidden sm:inline">Novo Paciente</span></Button>
           </div>
         </div>
@@ -144,7 +139,7 @@ const Patients = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-slate-600 hidden md:table-cell">{patient.lastVisit}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right"><Button variant="ghost" size="sm" className="text-teal-600 hover:bg-teal-500/10 hover:text-teal-700"><FileText className="w-4 h-4 mr-2" />Ver Ficha</Button></td>
                   </tr>
-                )) : (<tr><td colSpan={5} className="text-center py-16 text-slate-500">Nenhum paciente encontrado.</td></tr>)}
+                )) : (<tr><td colSpan={5} className="text-center py-16 text-slate-500">Nenhum paciente encontrado para este consultório.</td></tr>)}
               </tbody>
             </table>
           </div>

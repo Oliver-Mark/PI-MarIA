@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { db } from "@/firebase-config";
+import { collection, query, where, getDocs, DocumentData } from "firebase/firestore";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
-import { Calendar as CalendarIcon, CalendarDays, UserCheck, Users, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, CalendarDays, UserCheck, Users, Clock, Loader2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -11,12 +13,15 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
-const appointments = [
-  { id: 1, time: "08:00", patient: "Maria Silva Santos", reason: "Consulta", status: "confirmed" },
-  { id: 2, time: "08:10", patient: "João Pedro Oliveira", reason: "Retorno", status: "confirmed" },
-  { id: 3, time: "08:20", patient: "Ana Carolina Souza", reason: "Exame", status: "scheduled" },
-  { id: 4, time: "08:30", patient: "Carlos Eduardo Lima", reason: "Consulta", status: "confirmed" },
-];
+interface Appointment extends DocumentData {
+  id: string;
+  name: string;
+  // Assuming other fields like 'time', 'reason', 'status' will come from patient doc
+  // For now, we'll use static values for these for demonstration
+  time: string;
+  reason: string;
+  status: 'confirmed' | 'scheduled';
+}
 
 const GlassCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
   <div className={`bg-white/70 backdrop-blur-xl border border-black/5 shadow-lg rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${className}`}>
@@ -28,16 +33,51 @@ const Agenda = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      setIsLoading(true);
+      const officeId = localStorage.getItem("officeId");
+      if (!officeId) {
+        console.error("No officeId found in localStorage.");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const patientsCollection = collection(db, 'patients');
+        const q = query(patientsCollection, where('officeIds', 'array-contains', officeId));
+        const querySnapshot = await getDocs(q);
+        const appointmentsList = querySnapshot.docs.map((doc, index) => ({
+          id: doc.id,
+          name: doc.data().name,
+          // NOTE: These are mocked for now as they are not in the patient model
+          time: `08:${index * 10}`,
+          reason: "Consulta",
+          status: Math.random() > 0.5 ? 'confirmed' : 'scheduled',
+          ...doc.data(),
+        } as Appointment));
+        setAppointments(appointmentsList);
+      } catch (error) {
+        console.error("Error fetching appointments: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [selectedDate]); // Refetch when date changes, for future implementation
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
     setIsCalendarOpen(false);
   };
 
-  const filteredAppointments = appointments;
-  const hasAppointments = filteredAppointments.length > 0;
-  const confirmedAppointments = filteredAppointments.filter(a => a.status === "confirmed").length;
-  const scheduledAppointments = filteredAppointments.filter(a => a.status === "scheduled").length;
+  const hasAppointments = appointments.length > 0;
+  const confirmedAppointments = appointments.filter(a => a.status === "confirmed").length;
+  const scheduledAppointments = appointments.filter(a => a.status === "scheduled").length;
 
   return (
     <div className="min-h-screen w-full bg-slate-50 text-slate-800">
@@ -108,7 +148,7 @@ const Agenda = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 mb-1">Total de Pacientes</p>
-                <p className="text-3xl font-bold text-slate-800">{hasAppointments ? filteredAppointments.length : 0}</p>
+                <p className="text-3xl font-bold text-slate-800">{appointments.length}</p>
               </div>
               <Users className="w-8 h-8 text-green-500" />
             </div>
@@ -120,16 +160,20 @@ const Agenda = () => {
             <h2 className="text-xl font-semibold text-slate-800">Pacientes do Dia</h2>
           </div>
           <div className="px-6 pb-6">
-            {hasAppointments ? (
+            {isLoading ? (
+              <div className="flex justify-center items-center py-16">
+                <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+              </div>
+            ) : hasAppointments ? (
               <div className="space-y-3">
-                {filteredAppointments.map((appointment) => (
+                {appointments.map((appointment) => (
                   <div key={appointment.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl bg-slate-500/10 border border-transparent hover:border-teal-500/50 transition-all">
                     <div className="flex-shrink-0 w-full sm:w-24 flex items-center gap-2">
                         <Clock className="w-5 h-5 text-teal-600 sm:hidden"/>
                         <div className="text-base font-bold text-teal-600">{appointment.time}</div>
                     </div>
                     <div className="flex-1 min-w-0 w-full border-t border-slate-900/10 sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-4">
-                      <p className="font-semibold text-slate-800">{appointment.patient}</p>
+                      <p className="font-semibold text-slate-800">{appointment.name}</p>
                       <p className="text-sm text-slate-600">Motivo: {appointment.reason}</p>
                     </div>
                     <div className="flex-shrink-0 self-end sm:self-center">
@@ -143,8 +187,8 @@ const Agenda = () => {
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <CalendarIcon className="w-16 h-16 text-slate-300 mb-4" />
-                <p className="text-lg font-medium text-slate-700 mb-2">Nenhuma agenda programada</p>
-                <p className="text-sm text-slate-500">Não há pacientes agendados para a data selecionada.</p>
+                <p className="text-lg font-medium text-slate-700 mb-2">Nenhum paciente agendado</p>
+                <p className="text-sm text-slate-500">Não há pacientes agendados para este consultório na data selecionada.</p>
               </div>
             )}
           </div>

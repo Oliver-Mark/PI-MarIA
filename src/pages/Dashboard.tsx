@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { collection, getDocs, query, where, DocumentData } from "firebase/firestore";
+import { db } from "@/firebase-config";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Bell, Cake } from "lucide-react";
+import { Calendar, Bell, Cake, User, Loader2 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import carousel1 from "@/assets/carousel-1.jpg";
 import carousel2 from "@/assets/carousel-2.jpg";
@@ -14,29 +16,55 @@ const announcements = [
   { id: 3, image: carousel3, title: "Atualização do sistema - Dia 15" },
 ];
 
-const todaySchedule = [
-  { id: 1, time: "08:00", patient: "Maria Silva Santos", status: "confirmed" },
-  { id: 2, time: "08:30", patient: "João Pedro Oliveira", status: "confirmed" },
-  { id: 3, time: "09:00", patient: "Ana Carolina Souza", status: "waiting" },
-  { id: 4, time: "09:30", patient: "Carlos Eduardo Lima", status: "confirmed" },
-  { id: 5, time: "10:00", patient: "Fernanda Martins Costa", status: "confirmed" },
-];
-
 const notifications = [
   { id: 1, icon: Cake, text: "Maria Silva Santos faz aniversário hoje!", type: "birthday" },
   { id: 2, icon: Bell, text: "3 pacientes aguardando na sala de espera", type: "info" },
   { id: 3, icon: Calendar, text: "Lembrete: Reunião de equipe às 16h", type: "reminder" },
 ];
 
+interface Patient extends DocumentData {
+    id: string;
+    name: string;
+    // Add other patient fields as necessary
+}
+
 const Dashboard = () => {
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentAnnouncementIndex((prev) => (prev + 1) % announcements.length);
     }, 4000);
     return () => clearInterval(interval);
+  }, []);
+  
+  useEffect(() => {
+    const fetchPatients = async () => {
+      setIsLoading(true);
+      const officeId = localStorage.getItem("officeId");
+      if (!officeId) {
+        console.error("No officeId found in localStorage.");
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const patientsCollection = collection(db, 'patients');
+        const q = query(patientsCollection, where('officeIds', 'array-contains', officeId));
+        const patientsSnapshot = await getDocs(q);
+        const patientsList = patientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Patient));
+        setPatients(patientsList);
+      } catch (error) {
+        console.error("Error fetching patients: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatients();
   }, []);
 
   return (
@@ -91,20 +119,25 @@ const Dashboard = () => {
             </div>
 
             <Card className="lg:col-span-2">
-              <CardHeader><CardTitle className="text-xl flex items-center gap-2"><Calendar className="w-6 h-6 text-teal-500" />Agenda do Dia</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-xl flex items-center gap-2"><Calendar className="w-6 h-6 text-teal-500" />Pacientes do Consultório</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-2">
-                  {todaySchedule.map((appointment) => (
-                    <div key={appointment.id} className="flex items-center gap-4 p-3 rounded-lg border bg-slate-100/50">
-                      <div className="flex-shrink-0"><div className="text-base font-bold text-teal-600 w-16 text-center">{appointment.time}</div></div>
-                      <div className="flex-1 border-l border-slate-200 pl-4"><p className="font-medium text-slate-800 text-sm">{appointment.patient}</p></div>
-                      <div className="flex-shrink-0">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${appointment.status === "confirmed" ? "bg-teal-500/10 text-teal-600" : "bg-amber-500/10 text-amber-600"}`}>
-                          {appointment.status === "confirmed" ? "Confirmado" : "Aguardando"}
-                        </span>
-                      </div>
+                  {isLoading ? (
+                    <div className="flex justify-center items-center h-40">
+                      <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
                     </div>
-                  ))}
+                  ) : patients.length > 0 ? (
+                    patients.map((patient) => (
+                      <div key={patient.id} className="flex items-center gap-4 p-3 rounded-lg border bg-slate-100/50">
+                        <div className="flex-shrink-0"><div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center"><User className="w-5 h-5 text-teal-600"/></div></div>
+                        <div className="flex-1"><p className="font-medium text-slate-800 text-sm">{patient.name}</p></div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-10">
+                      <p className="text-slate-500">Nenhum paciente encontrado para este consultório.</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
