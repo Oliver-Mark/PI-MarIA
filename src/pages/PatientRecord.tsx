@@ -61,7 +61,7 @@ const PatientRecord = () => {
   const [patient] = useState(mockPatient);
 
   const handleNewAnamnesis = () => {
-    navigate(`/patient-record/${id}/anamnesis`);
+    navigate(`/anamnesis/${id}`);
   };
 
   const handleViewConsultation = (consultationId: number) => {
