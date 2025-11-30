@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Clock, UserCheck, Bell, CheckCircle2 } from "lucide-react";
