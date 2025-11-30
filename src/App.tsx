@@ -10,6 +10,7 @@ import SelectUnit from "./pages/SelectUnit";
 import Dashboard from "./pages/Dashboard";
 import Agenda from "./pages/Agenda";
 import WaitingRoom from "./pages/WaitingRoom";
+import PatientRecord from "./pages/PatientRecord";
 import Patients from "./pages/Patients";
 import Signature from "./pages/Signature";
 import Charts from "./pages/Charts";
@@ -45,6 +46,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/waiting-room" element={<WaitingRoom />} />
+            <Route path="/patient-record/:id" element={<PatientRecord />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/signature" element={<Signature />} />
             <Route path="/charts" element={<Charts />} />
