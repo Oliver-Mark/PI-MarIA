@@ -1,4 +1,3 @@
-import { seedDatabase } from "@/seedDatabase";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -42,7 +41,6 @@ const Login = () => {
   const [password, setPassword] = useState("123456"); // Default for testing
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
 
   // Step 2 State
   const [units, setUnits] = useState<Unit[]>([]);
@@ -100,21 +98,6 @@ const Login = () => {
     };
     fetchOffices();
   }, [selectedUnit]);
-
-  // Handle DB Seeding
-  const handleSeed = async () => {
-    setIsSeeding(true);
-    setError("");
-    try {
-      await seedDatabase();
-      alert('Banco de dados populado com sucesso!');
-    } catch (err) {
-      console.error(err);
-      setError("Ocorreu um erro ao popular o banco de dados.");
-    } finally {
-      setIsSeeding(false);
-    }
-  };
 
   // Handle Step 1: Email/Password Login and Profile Fetch
   const handleContinue = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -220,12 +203,6 @@ const Login = () => {
                 {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : "CONTINUAR"}
               </Button>
             </form>
-
-            <div className="mt-4">
-              <Button onClick={handleSeed} disabled={isSeeding} className="w-full h-12 text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded-xl">
-                {isSeeding ? <Loader2 className="w-6 h-6 animate-spin" /> : "Resetar e Popular Banco"}
-              </Button>
-            </div>
           </div>
         )}
 
