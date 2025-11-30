@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ const attendedPatients = [
 ];
 
 const WaitingRoom = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("waiting");
 
   const handleCall = (patientId: number) => {
@@ -28,8 +30,7 @@ const WaitingRoom = () => {
   };
 
   const handleAttend = (patientId: number) => {
-    console.log("Atender paciente:", patientId);
-    // Implementar lógica de atender paciente
+    navigate(`/patient-record/${patientId}`);
   };
 
   return (
