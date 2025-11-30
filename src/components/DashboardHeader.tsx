@@ -22,38 +22,39 @@ const DashboardHeader = ({ onMenuClick, userName = "Dr. João Silva" }: Dashboar
   };
 
   return (
-    <header className="fixed top-4 right-4 left-4 md:left-28 h-16 bg-white/60 backdrop-blur-xl border border-black/5 shadow-lg rounded-2xl z-40 flex items-center justify-between px-4">
+    <header className="fixed top-0 right-0 left-0 md:left-20 h-16 bg-teal-600 z-30 flex items-center justify-between px-6">
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-slate-800 hover:bg-black/5 hover:text-slate-900"
+          className="md:hidden text-white hover:bg-teal-700/50 hover:text-white"
           onClick={onMenuClick}
         >
           <Menu className="w-6 h-6" />
           <span className="sr-only">Abrir menu</span>
         </Button>
+        {/* Title can go here if needed, e.g., <h1 className="text-xl font-semibold text-white">Dashboard</h1> */}
       </div>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-black/5 rounded-full px-2 py-1.5 transition-colors">
+        <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-teal-700/50 rounded-full px-2 py-1.5 transition-colors">
           <img 
             src={defaultAvatar} 
             alt={userName} 
-            className="w-9 h-9 rounded-full object-cover border-2 border-teal-500/50"
+            className="w-9 h-9 rounded-full object-cover border-2 border-teal-400"
           />
           <div className="hidden sm:flex flex-col items-start">
-            <span className="font-medium text-sm text-slate-800">{userName}</span>
-            <span className="text-xs text-slate-500">Médico</span>
+            <span className="font-medium text-sm text-white">{userName}</span>
+            <span className="text-xs text-teal-200">Médico</span>
           </div>
-          <ChevronDown className="w-4 h-4 text-slate-500 hidden sm:block" />
+          <ChevronDown className="w-4 h-4 text-teal-200 hidden sm:block" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 mt-2 bg-white/80 backdrop-blur-xl border-black/10 shadow-2xl rounded-lg">
-          <DropdownMenuItem className="cursor-pointer text-slate-700 focus:bg-black/10 focus:text-slate-900">
+        <DropdownMenuContent align="end" className="w-56 mt-2 bg-teal-700 border-teal-600 text-white shadow-2xl rounded-lg">
+          <DropdownMenuItem className="cursor-pointer focus:bg-teal-600">
             <Settings className="w-4 h-4 mr-2" />
             Configurações da Conta
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500 focus:text-red-700 focus:bg-red-500/10">
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-400 focus:text-red-400 focus:bg-red-500/20">
             <LogOut className="w-4 h-4 mr-2" />
             Sair
           </DropdownMenuItem>

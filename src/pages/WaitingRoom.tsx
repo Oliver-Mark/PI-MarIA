@@ -28,9 +28,13 @@ const GlassCard = ({ children, className }: { children: React.ReactNode, classNa
 
 const WaitingRoom = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleCall = (patientId: number) => console.log("Chamar paciente:", patientId);
-  const handleAttend = (patientId: number) => console.log("Atender paciente:", patientId);
+  
+  const handleAttend = (patientId: number) => {
+    navigate(`/patient-record/${patientId}`);
+  };
 
   return (
     <div className="min-h-screen w-full bg-slate-50 text-slate-800">

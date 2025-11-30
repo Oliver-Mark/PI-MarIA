@@ -34,29 +34,32 @@ export const DashboardSidebarContent = ({ isMobile, onLinkClick }: DashboardSide
   const expanded = isMobile || isExpanded;
 
   return (
+    // NOTE: For mobile, this component is rendered inside a Sheet, so the 'fixed' positioning is for desktop only.
     <aside
       onMouseEnter={isMobile ? undefined : () => setIsExpanded(true)}
       onMouseLeave={isMobile ? undefined : () => setIsExpanded(false)}
-      className={`fixed left-4 top-4 bottom-4 bg-white/60 backdrop-blur-xl border border-black/5 shadow-lg transition-all duration-300 ease-in-out z-50 rounded-2xl
+      className={`fixed top-0 left-0 bottom-0 bg-teal-600 transition-all duration-300 ease-in-out z-40
         ${expanded ? "w-60" : "w-20"}`}
     >
       <div className="flex flex-col h-full">
-        <div className={`flex items-center gap-3 h-20 px-4 ${expanded ? 'justify-start' : 'justify-center'}`}>
-          <img src={logoMaria} alt="MarIA" className="h-9 w-auto flex-shrink-0" />
-          <span className={`text-xl font-bold text-slate-800 whitespace-nowrap transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0"}`}>
+        <div className={`flex items-center gap-3 h-16 px-4 ${expanded ? 'justify-start' : 'justify-center'}`}>
+          <div className="h-9 w-10 flex-shrink-0 flex items-center justify-center">
+            <img src={logoMaria} alt="MarIA" className="h-full w-full object-contain" />
+          </div>
+          <span className={`text-xl font-bold text-white whitespace-nowrap transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0"}`}>
             MarIA
           </span>
         </div>
 
-        <nav className="flex flex-col pt-4 px-3 flex-1">
+        <nav className="flex flex-col pt-4 px-2 flex-1">
           <div className="flex flex-col gap-2 w-full">
             {menuItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 onClick={onLinkClick}
-                className="flex items-center gap-4 px-3 py-3 rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-black/5 group"
-                activeClassName="bg-teal-500/10 text-teal-600 font-semibold"
+                className="flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 text-teal-100 hover:text-white hover:bg-teal-700/50 group"
+                activeClassName="bg-teal-700 text-white font-semibold"
               >
                 <item.icon className="w-6 h-6 flex-shrink-0 transition-transform" />
                 <span
@@ -76,6 +79,7 @@ export const DashboardSidebarContent = ({ isMobile, onLinkClick }: DashboardSide
 }
 
 const DashboardSidebar = () => {
+  // This wrapper is for desktop view. The mobile view is handled inside each page's Sheet component.
   return (
     <div className="hidden md:block">
       <DashboardSidebarContent />
