@@ -118,7 +118,7 @@ const Anamnesis = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader />
+      <DashboardHeader onMenuClick={() => {}} />
       <DashboardSidebar />
       
       <main className="ml-20 pt-6 px-6 pb-6">
