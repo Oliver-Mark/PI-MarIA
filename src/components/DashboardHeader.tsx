@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Settings, LogOut, ChevronDown, Menu } from "lucide-react";
 import defaultAvatar from "@/assets/default-avatar.jpg";
+import logoMaria from "@/assets/logo-maria.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +24,7 @@ const DashboardHeader = ({ onMenuClick, userName = "Dr. João Silva" }: Dashboar
 
   return (
     <header className="fixed top-0 right-0 left-0 md:left-20 h-16 bg-teal-600 z-30 flex items-center justify-between px-6">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
@@ -33,7 +34,10 @@ const DashboardHeader = ({ onMenuClick, userName = "Dr. João Silva" }: Dashboar
           <Menu className="w-6 h-6" />
           <span className="sr-only">Abrir menu</span>
         </Button>
-        {/* Title can go here if needed, e.g., <h1 className="text-xl font-semibold text-white">Dashboard</h1> */}
+        <div className="flex items-center gap-3">
+          <img src={logoMaria} alt="MarIA" className="h-12 w-auto rounded-2xl" />
+          <span className="text-xl font-bold text-white hidden sm:block">MarIA</span>
+        </div>
       </div>
 
       <DropdownMenu>

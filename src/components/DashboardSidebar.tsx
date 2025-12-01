@@ -41,15 +41,7 @@ export const DashboardSidebarContent = ({ isMobile, onLinkClick }: DashboardSide
       className={`fixed top-0 left-0 bottom-0 bg-teal-600 transition-all duration-300 ease-in-out z-40
         ${expanded ? "w-60" : "w-20"}`}
     >
-      <div className="flex flex-col h-full">
-        <div className={`flex items-center gap-3 h-16 px-4 ${expanded ? 'justify-start' : 'justify-center'}`}>
-          <div className="h-9 w-10 flex-shrink-0 flex items-center justify-center">
-            <img src={logoMaria} alt="MarIA" className="h-full w-full object-contain" />
-          </div>
-          <span className={`text-xl font-bold text-white whitespace-nowrap transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0"}`}>
-            MarIA
-          </span>
-        </div>
+      <div className="flex flex-col h-full pt-16">{/* pt-16 to account for header */}
 
         <nav className="flex flex-col pt-4 px-2 flex-1">
           <div className="flex flex-col gap-2 w-full">
