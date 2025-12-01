@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import logoMaria from "@/assets/logo-maria.png";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import ImageCarousel from "@/components/ImageCarousel";
 
 // Data Structures
 interface Unit extends DocumentData {
@@ -165,21 +166,28 @@ const Login = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #ffffff, #F0FDFC)',
-      }}
-    >
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-teal-500/5 rounded-full filter blur-3xl animate-blob"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-cyan-500/5 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Carousel - Left Side (Hidden on mobile) */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <ImageCarousel />
+      </div>
 
-      <div className="relative w-full max-w-md bg-white/85 backdrop-blur-2xl border border-white/60 shadow-2xl rounded-3xl p-8">
+      {/* Login Form - Right Side */}
+      <div 
+        className="w-full lg:w-1/2 flex items-center justify-center p-4 relative"
+        style={{
+          background: 'linear-gradient(135deg, #ffffff, #F0FDFC)',
+        }}
+      >
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-teal-500/5 rounded-full filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-cyan-500/5 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+
+        <div className="relative w-full max-w-md bg-white/85 backdrop-blur-2xl border border-white/60 shadow-2xl rounded-3xl p-8">
         
         {step === 1 && (
           <div className="animate-fade-in">
             <div className="flex justify-center mb-8">
-              <img src={logoMaria} alt="MarIA" className="h-24 w-auto" />
+              <img src={logoMaria} alt="MarIA" className="h-24 w-auto rounded-3xl" />
             </div>
             <form className="space-y-4">
               <div className="space-y-2">
@@ -254,6 +262,7 @@ const Login = () => {
             </form>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
