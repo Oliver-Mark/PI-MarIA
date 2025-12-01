@@ -42,12 +42,12 @@ export const DashboardSidebarContent = ({ isMobile, onLinkClick }: DashboardSide
         ${expanded ? "w-60" : "w-20"}`}
     >
       <div className="flex flex-col h-full">
-        <div className={`flex items-center justify-center h-16 transition-all duration-300 ${expanded ? 'px-4' : 'px-2'}`}>
+        <div className="flex items-center justify-center h-16">
           <img 
             src={logoMaria} 
             alt="MarIA" 
             className={`rounded-3xl object-contain transition-all duration-300 ${
-              expanded ? 'h-16 w-16' : 'h-14 w-14'
+              expanded ? 'h-16 w-16' : 'h-12 w-12'
             }`} 
           />
         </div>
