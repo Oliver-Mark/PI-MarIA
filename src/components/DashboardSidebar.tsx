@@ -47,7 +47,7 @@ export const DashboardSidebarContent = ({ isMobile, onLinkClick }: DashboardSide
             src={logoMaria} 
             alt="MarIA" 
             className={`rounded-3xl object-contain transition-all duration-300 ${
-              expanded ? 'h-16 w-16' : 'h-16 w-16'
+              expanded ? 'h-20 w-20' : 'h-16 w-16'
             }`} 
           />
         </div>
