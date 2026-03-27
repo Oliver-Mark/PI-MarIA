@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { db } from "@/firebase-config";
-import { collection, query, where, getDocs, DocumentData } from "firebase/firestore";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Calendar as CalendarIcon, CalendarDays, UserCheck, Users, Clock, Loader2 } from "lucide-react";
@@ -13,14 +11,13 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
-interface Appointment extends DocumentData {
+interface Appointment {
   id: string;
   name: string;
-  // Assuming other fields like 'time', 'reason', 'status' will come from patient doc
-  // For now, we'll use static values for these for demonstration
   time: string;
   reason: string;
   status: 'confirmed' | 'scheduled';
+  officeIds: string[];
 }
 
 const GlassCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -28,6 +25,15 @@ const GlassCard = ({ children, className }: { children: React.ReactNode, classNa
     {children}
   </div>
 );
+
+// Mock Data
+const mockAppointments: Appointment[] = [
+    { id: '1', name: 'João da Silva', time: '09:00', reason: 'Consulta de rotina', status: 'confirmed', officeIds: ['101'] },
+    { id: '2', name: 'Maria Oliveira', time: '09:30', reason: 'Retorno', status: 'scheduled', officeIds: ['101', '201'] },
+    { id: '3', name: 'Carlos Pereira', time: '10:00', reason: 'Exames', status: 'confirmed', officeIds: ['102'] },
+    { id: '4', name: 'Ana Souza', time: '10:30', reason: 'Primeira consulta', status: 'scheduled', officeIds: ['201'] },
+    { id: '5', name: 'Pedro Santos', time: '11:00', reason: 'Check-up', status: 'confirmed', officeIds: ['101'] },
+];
 
 const Agenda = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -37,7 +43,7 @@ const Agenda = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchAppointments = () => {
       setIsLoading(true);
       const officeId = localStorage.getItem("officeId");
       if (!officeId) {
@@ -46,29 +52,16 @@ const Agenda = () => {
         return;
       }
 
-      try {
-        const patientsCollection = collection(db, 'patients');
-        const q = query(patientsCollection, where('officeIds', 'array-contains', officeId));
-        const querySnapshot = await getDocs(q);
-        const appointmentsList = querySnapshot.docs.map((doc, index) => ({
-          id: doc.id,
-          name: doc.data().name,
-          // NOTE: These are mocked for now as they are not in the patient model
-          time: `08:${index * 10}`,
-          reason: "Consulta",
-          status: Math.random() > 0.5 ? 'confirmed' : 'scheduled',
-          ...doc.data(),
-        } as Appointment));
-        setAppointments(appointmentsList);
-      } catch (error) {
-        console.error("Error fetching appointments: ", error);
-      } finally {
+      // Simulate API call
+      setTimeout(() => {
+        const officeAppointments = mockAppointments.filter(a => a.officeIds.includes(officeId));
+        setAppointments(officeAppointments);
         setIsLoading(false);
-      }
+      }, 500);
     };
 
     fetchAppointments();
-  }, [selectedDate]); // Refetch when date changes, for future implementation
+  }, [selectedDate]);
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);

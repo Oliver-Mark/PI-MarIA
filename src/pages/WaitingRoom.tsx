@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { db } from "@/firebase-config";
-import { collection, query, where, getDocs, DocumentData } from "firebase/firestore";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Clock, UserCheck, Bell, CheckCircle2, Loader2, Users } from "lucide-react";
@@ -10,15 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
-interface Patient extends DocumentData {
+interface Patient {
   id: string;
   name: string;
-  status: 'waiting' | 'attended' | 'scheduled'; // Allow 'scheduled'
-  // Mocking these for now
+  status: 'waiting' | 'attended' | 'scheduled';
   scheduledTime: string;
   arrivalTime: string;
   reason: string;
   doctor: string;
+  officeIds: string[];
 }
 
 const GlassCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -27,6 +25,14 @@ const GlassCard = ({ children, className }: { children: React.ReactNode, classNa
   </div>
 );
 
+// Mock Data
+const mockPatients: Patient[] = [
+    { id: '1', name: 'João da Silva', status: 'waiting', scheduledTime: '09:00', arrivalTime: '08:55', reason: 'Consulta de rotina', doctor: 'Dr. House', officeIds: ['101'] },
+    { id: '2', name: 'Maria Oliveira', status: 'scheduled', scheduledTime: '09:30', arrivalTime: '09:28', reason: 'Retorno', doctor: 'Dr. House', officeIds: ['101', '201'] },
+    { id: '3', name: 'Carlos Pereira', status: 'attended', scheduledTime: '10:00', arrivalTime: '09:58', reason: 'Exames', doctor: 'Dr. Wilson', officeIds: ['102'] },
+    { id: '4', name: 'Ana Souza', status: 'waiting', scheduledTime: '10:30', arrivalTime: '10:32', reason: 'Primeira consulta', doctor: 'Dr. Wilson', officeIds: ['201'] },
+];
+
 const WaitingRoom = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -34,7 +40,7 @@ const WaitingRoom = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPatients = async () => {
+    const fetchPatients = () => {
       setIsLoading(true);
       const selectedOfficeId = localStorage.getItem("officeId");
       console.log('Consultório Selecionado:', selectedOfficeId);
@@ -45,30 +51,13 @@ const WaitingRoom = () => {
         setPatients([]);
         return;
       }
-
-      try {
-        const patientsCollection = collection(db, 'patients');
-        
-        // Fetch waiting, attended, AND scheduled patients
-        const q = query(
-          patientsCollection, 
-          where('officeIds', 'array-contains', selectedOfficeId),
-          where('status', 'in', ['waiting', 'attended', 'scheduled']) 
-        );
-        
-        const querySnapshot = await getDocs(q);
-        const patientsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as Patient));
-        
-        setPatients(patientsList);
-
-      } catch (error) {
-        console.error("Erro ao buscar pacientes. Isso pode ser um problema de índice no Firestore.", error);
-      } finally {
+      
+      // Simulate API call
+      setTimeout(() => {
+        const officePatients = mockPatients.filter(p => p.officeIds.includes(selectedOfficeId) && ['waiting', 'attended', 'scheduled'].includes(p.status));
+        setPatients(officePatients);
         setIsLoading(false);
-      }
+      }, 500);
     };
 
     fetchPatients();
@@ -80,7 +69,6 @@ const WaitingRoom = () => {
     navigate(`/patient-record/${patientId}`);
   };
 
-  // Scheduled patients will now appear in the "Waiting" list
   const waitingPatients = patients.filter(p => p.status === 'waiting' || p.status === 'scheduled');
   const attendedPatients = patients.filter(p => p.status === 'attended');
 

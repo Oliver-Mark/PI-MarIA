@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs, query, where, DocumentData } from "firebase/firestore";
-import { db } from "@/firebase-config";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,11 +20,19 @@ const notifications = [
   { id: 3, icon: Calendar, text: "Lembrete: Reunião de equipe às 16h", type: "reminder" },
 ];
 
-interface Patient extends DocumentData {
+interface Patient {
     id: string;
     name: string;
-    // Add other patient fields as necessary
+    officeIds: string[];
 }
+
+// Mock Data
+const mockPatients: Patient[] = [
+    { id: '1', name: 'João da Silva', officeIds: ['101'] },
+    { id: '2', name: 'Maria Oliveira', officeIds: ['101', '201'] },
+    { id: '3', name: 'Carlos Pereira', officeIds: ['102'] },
+    { id: '4', name: 'Ana Souza', officeIds: ['201'] },
+];
 
 const Dashboard = () => {
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
@@ -42,7 +48,7 @@ const Dashboard = () => {
   }, []);
   
   useEffect(() => {
-    const fetchPatients = async () => {
+    const fetchPatients = () => {
       setIsLoading(true);
       const officeId = localStorage.getItem("officeId");
       if (!officeId) {
@@ -51,17 +57,12 @@ const Dashboard = () => {
         return;
       }
       
-      try {
-        const patientsCollection = collection(db, 'patients');
-        const q = query(patientsCollection, where('officeIds', 'array-contains', officeId));
-        const patientsSnapshot = await getDocs(q);
-        const patientsList = patientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Patient));
-        setPatients(patientsList);
-      } catch (error) {
-        console.error("Error fetching patients: ", error);
-      } finally {
+      // Simulate API call
+      setTimeout(() => {
+        const officePatients = mockPatients.filter(p => p.officeIds.includes(officeId));
+        setPatients(officePatients);
         setIsLoading(false);
-      }
+      }, 500);
     };
 
     fetchPatients();

@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/firebase-config";
-import { collection, getDocs, query, where, doc, getDoc, DocumentData } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,22 +14,29 @@ import logoMaria from "@/assets/logo-maria.png";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import ImageCarousel from "@/components/ImageCarousel";
 
-// Data Structures
-interface Unit extends DocumentData {
+// Data Structures (now simplified and local)
+interface Unit {
   id: string;
   name: string;
 }
 
-interface Office extends DocumentData {
+interface Office {
   id: string;
   name: string;
   unitId: string;
 }
 
-interface UserProfile {
-  acesso_total: boolean;
-  unidades_ids: string[];
-}
+// Mock Data
+const mockUnits: Unit[] = [
+    { id: '1', name: 'Unidade Principal' },
+    { id: '2', name: 'Unidade Secundária' }
+  ];
+  
+  const mockOffices: Office[] = [
+    { id: '101', name: 'Consultório 1', unitId: '1' },
+    { id: '102', name: 'Consultório 2', unitId: '1' },
+    { id: '201', name: 'Consultório 3', unitId: '2' },
+  ];
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,104 +53,40 @@ const Login = () => {
   const [selectedUnit, setSelectedUnit] = useState("");
   const [selectedOffice, setSelectedOffice] = useState("");
   
-  // User Permission State
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-
-  // Fetch Units based on User Permissions
+  // On step 2, load mock units
   useEffect(() => {
-    const fetchUnits = async () => {
-      if (step === 2 && userProfile) {
-        setIsLoading(true);
-        try {
-          const unitsCollection = collection(db, 'units');
-          const unitsSnapshot = await getDocs(unitsCollection);
-          let unitsList = unitsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Unit));
+    if (step === 2) {
+      setUnits(mockUnits);
+    }
+  }, [step]);
 
-          // Filter units based on user permissions
-          if (!userProfile.acesso_total) {
-            unitsList = unitsList.filter(unit => userProfile.unidades_ids.includes(unit.id));
-          }
-          
-          setUnits(unitsList);
-        } catch (err) {
-          console.error("Error fetching units: ", err);
-          setError("Falha ao carregar as unidades.");
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-    fetchUnits();
-  }, [step, userProfile]);
-
-  // Fetch Offices for the selected Unit
+  // When a unit is selected, load mock offices
   useEffect(() => {
-    const fetchOffices = async () => {
-      if (selectedUnit) {
-        try {
-          setOffices([]); 
-          setSelectedOffice("");
-          const officesCollection = collection(db, 'offices');
-          const q = query(officesCollection, where('unitId', '==', selectedUnit));
-          const officesSnapshot = await getDocs(q);
-          const officesList = officesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Office));
-          setOffices(officesList);
-        } catch (err) {
-          console.error("Error fetching offices: ", err);
-          setError("Falha ao carregar os consultórios.");
-        }
-      }
-    };
-    fetchOffices();
+    if (selectedUnit) {
+      setOffices(mockOffices.filter(o => o.unitId === selectedUnit));
+      setSelectedOffice(""); // Reset office selection
+    } else {
+      setOffices([]);
+    }
   }, [selectedUnit]);
 
-  // Handle Step 1: Email/Password Login and Profile Fetch
-  const handleContinue = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  // Handle Step 1: Just proceed to step 2
+  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!email || !password) return;
 
     setIsLoading(true);
     setError("");
 
-    try {
-      // 1. Sign in with Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      if (user && user.email) {
-        // 2. Fetch user profile from Firestore
-        const userDocRef = doc(db, 'users', user.email);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (!userDocSnap.exists()) {
-          setError("Usuário sem perfil de acesso configurado.");
-          await auth.signOut(); // Sign out to prevent inconsistent state
-          return;
-        }
-
-        const userData = userDocSnap.data();
-        const profile: UserProfile = {
-          acesso_total: userData.permissoes.acesso_total,
-          unidades_ids: userData.permissoes.unidades_ids,
-        };
-        
-        setUserProfile(profile);
-        setStep(2); // Proceed to step 2 on success
-      }
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        setError("Email ou senha inválidos.");
-      } else {
-        setError("Ocorreu um erro ao fazer login. Tente novamente.");
-      }
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    // Simulate a quick network delay
+    setTimeout(() => {
+        setStep(2);
+        setIsLoading(false);
+    }, 500);
   };
 
   // Handle Step 2: Unit/Office selection and final login
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (selectedUnit && selectedOffice) {
       localStorage.setItem("unitId", selectedUnit);
@@ -157,9 +97,6 @@ const Login = () => {
   
   const handleGoBack = () => {
     setStep(1);
-    setUserProfile(null);
-    setUnits([]);
-    setOffices([]);
     setSelectedUnit("");
     setSelectedOffice("");
     setError("");
@@ -231,7 +168,7 @@ const Login = () => {
                     <SelectValue placeholder="Selecione a unidade" />
                   </SelectTrigger>
                   <SelectContent>
-                    {units.length === 0 && !isLoading && <p className="p-4 text-sm text-slate-500">Nenhuma unidade disponível para seu usuário.</p>}
+                    {units.length === 0 && !isLoading && <p className="p-4 text-sm text-slate-500">Nenhuma unidade disponível.</p>}
                     {units.map(unit => (
                       <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>
                     ))}

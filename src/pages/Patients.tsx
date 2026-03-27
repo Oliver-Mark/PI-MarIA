@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { db } from "@/firebase-config";
-import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar, { DashboardSidebarContent } from "@/components/DashboardSidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, FileText, UserPlus, Upload, Loader2 } from "lucide-react";
+import { Search, FileText, UserPlus, Loader2 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -32,6 +30,15 @@ const InitialPatientState = {
   lastVisit: new Date().toLocaleDateString('pt-BR'),
 };
 
+// Mock Data
+const mockPatients = [
+  { id: '1', name: 'João da Silva', cpf: '111.222.333-44', phone: '(11) 98765-4321', lastVisit: '25/03/2026', officeIds: ['101'] },
+  { id: '2', name: 'Maria Oliveira', cpf: '222.333.444-55', phone: '(21) 91234-5678', lastVisit: '24/03/2026', officeIds: ['101', '201'] },
+  { id: '3', name: 'Carlos Pereira', cpf: '333.444.555-66', phone: '(31) 99887-7665', lastVisit: '23/03/2026', officeIds: ['102'] },
+  { id: '4', name: 'Ana Souza', cpf: '444.555.666-77', phone: '(41) 98877-6655', lastVisit: '22/03/2026', officeIds: ['201'] },
+];
+
+
 const Patients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,9 +48,7 @@ const Patients = () => {
   const [newPatient, setNewPatient] = useState(InitialPatientState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const patientsCollectionRef = collection(db, "patients");
-
-  const fetchPatients = async () => {
+  const fetchPatients = () => {
     setIsLoading(true);
     const officeId = localStorage.getItem("officeId");
     if (!officeId) {
@@ -52,15 +57,12 @@ const Patients = () => {
       return;
     }
 
-    try {
-      const q = query(patientsCollectionRef, where("officeIds", "array-contains", officeId));
-      const data = await getDocs(q);
-      setPatients(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    } catch (error) {
-      console.error("Erro ao buscar pacientes: ", error);
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
+      const officePatients = mockPatients.filter(p => p.officeIds.includes(officeId));
+      setPatients(officePatients);
       setIsLoading(false);
-    }
+    }, 500);
   };
 
   useEffect(() => {
@@ -72,7 +74,7 @@ const Patients = () => {
     setNewPatient((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleAddPatient = async (e: React.FormEvent) => {
+  const handleAddPatient = (e: React.FormEvent) => {
     e.preventDefault();
     const officeId = localStorage.getItem("officeId");
 
@@ -86,21 +88,19 @@ const Patients = () => {
     }
 
     setIsSubmitting(true);
-    try {
-      const patientData = {
+    // Simulate API call
+    setTimeout(() => {
+      const newPatientData = {
+        id: (mockPatients.length + 1).toString(),
         ...newPatient,
-        officeIds: [officeId], // Save it as an array
+        officeIds: [officeId],
       };
-      await addDoc(patientsCollectionRef, patientData);
+      mockPatients.push(newPatientData); // Add to mock data source
+      setPatients(prev => [...prev, newPatientData]); // Add to current state
       setIsAddDialogOpen(false);
       setNewPatient(InitialPatientState);
-      fetchPatients(); // Refresh the list
-    } catch (error) {
-      console.error("Erro ao adicionar paciente: ", error);
-      alert("Erro ao adicionar novo paciente.");
-    } finally {
       setIsSubmitting(false);
-    }
+    }, 500);
   };
 
   const filteredPatients = patients.filter(patient => 
